@@ -1,6 +1,7 @@
 package net.lzzy.cinemanager.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,11 +12,15 @@ import android.widget.SearchView;
 import android.widget.TextView;
 
 import net.lzzy.cinemanager.R;
+import net.lzzy.cinemanager.fragments.CinemasFragment;
+import net.lzzy.cinemanager.fragments.OrdersFragment;
 
 /**
  * @author Administrator
  */
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
+    private FragmentManager manager=getSupportFragmentManager();
+
 
     private LinearLayout layoutMenu;
     private TextView tvTitle;
@@ -50,6 +55,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             System.exit(0); });
     }
 
+
     /** 对标题栏的点击监听 **/
     @Override
     public void onClick(View v) {
@@ -60,6 +66,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             case R.id.bar_title_tv_view_cinema:
                 tvTitle.setText(R.string.bar_title_menu_cinema);
+                manager.beginTransaction()
+                        .replace(R.id.fragment_container,new CinemasFragment())
+                        .commit();
                 break;
 
             case R.id.bar_title_tv_add_order:
@@ -68,6 +77,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             case R.id.bar_title_tv_view_order:
                 tvTitle.setText(R.string.bar_title_menu_orders);
+                manager.beginTransaction()
+                        .replace(R.id.fragment_container,new OrdersFragment())
+                        .commit();
                 break;
 
             default:
