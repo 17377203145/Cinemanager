@@ -16,6 +16,8 @@ import android.widget.SearchView;
 import android.widget.TextView;
 
 import net.lzzy.cinemanager.R;
+import net.lzzy.cinemanager.fragments.AddCinemasFragment;
+import net.lzzy.cinemanager.fragments.AddOrdersFragment;
 import net.lzzy.cinemanager.fragments.CinemasFragment;
 import net.lzzy.cinemanager.fragments.OrdersFragment;
 
@@ -31,7 +33,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private SearchView search;
     private TextView textView;
     private SparseArray<String>titleArry=new SparseArray<>();
-    private SparseArray<Fragment>FragmentArray=new SparseArray<>();
+    private SparseArray<Fragment>fragmentArray=new SparseArray<>();
 
 
     @Override
@@ -46,6 +48,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     /** 自定义标题栏 **/
     private void setTitleMenu() {
+        titleArry.put(R.id.bar_title_tv_add_cinema,"添加影院");
+        titleArry.put(R.id.bar_title_tv_view_cinema,"影院列表");
+        titleArry.put(R.id.bar_title_tv_add_order,"添加订单");
+        titleArry.put(R.id.bar_title_tv_view_order,"订单列表");
         layoutMenu = findViewById(R.id.bar_title_layout_menu);
         layoutMenu.setVisibility(View.GONE);
         findViewById(R.id.bar_title_img_menu).setOnClickListener(v -> {
@@ -71,10 +77,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         layoutMenu.setVisibility(View.GONE);
         tvTitle.setText(titleArry.get(v.getId()));
         FragmentTransaction transaction = manager.beginTransaction();
-        Fragment fragment = FragmentArray.get(v.getId());
+        Fragment fragment = fragmentArray.get(v.getId());
         if (fragment == null) {
             fragment = createFragment(v.getId());
-            FragmentArray.put(v.getId(), fragment);
+            fragmentArray.put(v.getId(), fragment);
             transaction.add(R.id.fragment_container, fragment);
         }
         for (Fragment f : manager.getFragments()) {
@@ -86,13 +92,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         switch (id) {
             case R.id.bar_title_tv_add_cinema:
-            break;
+                return new AddCinemasFragment();
 
             case R.id.bar_title_tv_view_cinema:
                return new CinemasFragment();
 
             case R.id.bar_title_tv_add_order:
-                break;
+               return new AddOrdersFragment();
 
             case R.id.bar_title_tv_view_order:
                 return new OrdersFragment();
