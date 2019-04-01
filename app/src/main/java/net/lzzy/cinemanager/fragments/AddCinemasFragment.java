@@ -1,5 +1,6 @@
 package net.lzzy.cinemanager.fragments;
 
+import android.content.Context;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -21,17 +22,24 @@ public class AddCinemasFragment extends BaseFragment {
     private String province="广西壮族自治区";
     private String city="柳州市";
     private String area="鱼峰区";
+    //3.定义接口对象
+    private OnFragmentInterctionListener listener;
+    private OnCinemasCreatedListener cinemLister;
     private EditText edtName;
     private TextView tvArea;
+
+
+
 
     public AddCinemasFragment(){}
 
     @Override
     protected void populate() {
+        listener.hidesSearch();
         tvArea = find(R.id.dialog_add_tv_area);
         edtName = find(R.id.dialog_add_cinema_edt_name);
         find(R.id.dialog_add_cinema_btn_cancel).setOnClickListener(v -> {
-
+         cinemLister.cancelAddCinema();
         });
         find(R.id.dialog_add_cinema_layout_area).setOnClickListener(v -> {
             JDCityPicker cityPicker = new JDCityPicker();
@@ -61,12 +69,51 @@ public class AddCinemasFragment extends BaseFragment {
             cinema.setProvince(province);
             cinema.setLocation(tvArea.getText().toString());
             edtName.setText("");
+            cinemLister.saveCineam(cinema);
 
         });
+
     }
 
     @Override
     public int getLayoutRes() {
         return R.layout.add_fragment_cinemas;
+    }
+
+    @Override
+    public void search(String kw) {
+
+    }
+
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        if (!hidden){
+            listener.hidesSearch();
+        }
+    }
+
+    //4.赋值和摧毁
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        try {
+        listener=(OnFragmentInterctionListener) context;
+        cinemLister= (OnCinemasCreatedListener) context;
+        }catch (ClassCastException e){
+            throw new ClassCastException(context.toString()+"必须实现OnFragmentInterctionListener");
+        }
+    }
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        listener=null;
+        cinemLister=null;
+    }
+     //取消保存
+    public interface OnCinemasCreatedListener{
+        void cancelAddCinema();
+       //保存
+        void saveCineam(Cinema cinema);
     }
 }

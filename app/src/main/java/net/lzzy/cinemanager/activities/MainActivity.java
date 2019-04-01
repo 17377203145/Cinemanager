@@ -18,13 +18,18 @@ import android.widget.TextView;
 import net.lzzy.cinemanager.R;
 import net.lzzy.cinemanager.fragments.AddCinemasFragment;
 import net.lzzy.cinemanager.fragments.AddOrdersFragment;
+import net.lzzy.cinemanager.fragments.BaseFragment;
 import net.lzzy.cinemanager.fragments.CinemasFragment;
+import net.lzzy.cinemanager.fragments.OnFragmentInterctionListener;
 import net.lzzy.cinemanager.fragments.OrdersFragment;
+import net.lzzy.cinemanager.models.Cinema;
+import net.lzzy.cinemanager.utils.ViewUtils;
 
 /**
  * @author Administrator
- */
-public class MainActivity extends AppCompatActivity implements View.OnClickListener{
+ */ //2.实现接口
+public class MainActivity extends AppCompatActivity implements View.OnClickListener,
+        OnFragmentInterctionListener, AddCinemasFragment.OnCinemasCreatedListener {
     private FragmentManager manager=getSupportFragmentManager();
 
 
@@ -34,6 +39,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private TextView textView;
     private SparseArray<String>titleArry=new SparseArray<>();
     private SparseArray<Fragment>fragmentArray=new SparseArray<>();
+    public static final String EXTRA_CINEMA_ID="cinema";
 
 
     @Override
@@ -43,6 +49,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_main);
         setTitleMenu();
+        search.setOnQueryTextListener(new ViewUtils.AbstractQueryHandler() {
+            @Override
+            public boolean handleQuery(String kw) {
+                Fragment fragment=manager.findFragmentById(R.id.fragment_container);
+                if (fragment!=null){
+                    if (fragment instanceof BaseFragment){
+                        ((BaseFragment)fragment).search(kw);
+                    }
+                }
+                return true;
+            }
+
+        });
     }
 
 
@@ -74,6 +93,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     /** 对标题栏的点击监听 **/
     @Override
     public void onClick(View v) {
+        search.setVisibility(View.VISIBLE);
         layoutMenu.setVisibility(View.GONE);
         tvTitle.setText(titleArry.get(v.getId()));
         FragmentTransaction transaction = manager.beginTransaction();
@@ -107,4 +127,46 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         return null;
     }
-}
+
+    @Override
+    public void hidesSearch() {
+        search.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void cancelAddCinema() {
+        Fragment addCinemaFragment=fragmentArray.get(R.id.bar_title_tv_add_cinema);
+        if (addCinemaFragment==null){
+            return;
+        }
+        Fragment cinemasFragment=fragmentArray.get(R.id.bar_title_tv_view_cinema);
+        FragmentTransaction transaction=manager.beginTransaction();
+        if (cinemasFragment==null){
+            cinemasFragment=new CinemasFragment();
+            fragmentArray.put(R.id.bar_title_tv_view_cinema,cinemasFragment);
+            transaction.add(R.id.fragment_container,cinemasFragment);
+        }
+        transaction.hide(addCinemaFragment).show(cinemasFragment ).commit();
+        tvTitle.setText(titleArry.get(R.id.bar_title_tv_add_cinema));
+    }
+
+    @Override
+    public void saveCineam(Cinema cinema) {
+        Fragment addCinemaFragment=fragmentArray.get(R.id.bar_title_tv_add_cinema);
+        if (addCinemaFragment==null){
+            return;
+        }
+        Fragment cinemasFragment=fragmentArray.get(R.id.bar_title_tv_view_cinema);
+        FragmentTransaction transaction=manager.beginTransaction();
+        if (cinemasFragment==null){
+            cinemasFragment=new CinemasFragment(cinema);
+            fragmentArray.put(R.id.bar_title_tv_view_cinema,cinemasFragment);
+            transaction.add(R.id.fragment_container,cinemasFragment);
+        }else {
+            ((CinemasFragment)cinemasFragment).save(cinema);
+        }
+        transaction.hide(addCinemaFragment).show(cinemasFragment ).commit();
+        tvTitle.setText(titleArry.get(R.id.bar_title_tv_add_cinema));
+        }
+    }
+

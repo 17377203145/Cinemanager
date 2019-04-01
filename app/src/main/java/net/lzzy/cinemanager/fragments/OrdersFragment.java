@@ -18,4 +18,9 @@ public class OrdersFragment extends BaseFragment {
     public int getLayoutRes() {
         return R.layout.fragment_orders;
     }
+
+    @Override
+    public void search(String kw) {
+
+    }
 }

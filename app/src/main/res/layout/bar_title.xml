@@ -53,7 +53,8 @@
             android:layout_width="150dp"
             android:layout_height="wrap_content"
             android:text="@string/bar_title_menu_orders"
-            android:textSize="18sp" />
+            android:textSize="18sp"
+            />
 
         <View
             android:layout_width="150dp"
@@ -66,7 +67,6 @@
             android:layout_height="wrap_content"
             android:text="@string/bar_title_menu_add_orders"
             android:textSize="18sp" />
-
         <View
             android:layout_width="150dp"
             android:layout_height="2dp"
