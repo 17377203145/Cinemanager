@@ -19,7 +19,7 @@ public class CinemaFactory {
         return OUR_INSTANCE;
     }
 
-    private CinemaFactory() {
+    public CinemaFactory() {
         repository = new SqlRepository<>(AppUtils.getContext(),Cinema.class, DbConstants.packager);
     }
 

@@ -24,6 +24,7 @@ import java.util.List;
  * Description:
  */
 public class CinemasFragment extends BaseFragment {
+    private static final CinemaFactory OUR_INSTANCE = new CinemaFactory();
     private ListView lv;
     private List<Cinema>cinemas;
     private CinemaFactory factory=CinemaFactory.getInstance();
@@ -31,6 +32,9 @@ public class CinemasFragment extends BaseFragment {
     private Cinema cinema;
     public  CinemasFragment(){}
     public  CinemasFragment(Cinema cinema){this.cinema=cinema;}
+    public static CinemaFactory getInstance() {
+        return OUR_INSTANCE;
+    }
 
     @Override
     protected void populate() {
@@ -57,6 +61,9 @@ public class CinemasFragment extends BaseFragment {
             }
         };
         lv.setAdapter(adapter);
+        if (cinema!=null){
+            save(cinema);
+        }
 
 
     }

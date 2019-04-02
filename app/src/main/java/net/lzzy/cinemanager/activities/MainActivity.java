@@ -23,23 +23,20 @@ import net.lzzy.cinemanager.fragments.CinemasFragment;
 import net.lzzy.cinemanager.fragments.OnFragmentInterctionListener;
 import net.lzzy.cinemanager.fragments.OrdersFragment;
 import net.lzzy.cinemanager.models.Cinema;
+import net.lzzy.cinemanager.models.Order;
 import net.lzzy.cinemanager.utils.ViewUtils;
 
 /**
  * @author Administrator
  */ //2.实现接口
 public class MainActivity extends AppCompatActivity implements View.OnClickListener,
-        OnFragmentInterctionListener, AddCinemasFragment.OnCinemasCreatedListener {
+        OnFragmentInterctionListener, AddCinemasFragment.OnCinemasCreatedListener,AddOrdersFragment.OnOrderCreatedListener {
     private FragmentManager manager=getSupportFragmentManager();
-
-
     private LinearLayout layoutMenu;
     private TextView tvTitle;
     private SearchView search;
-    private TextView textView;
-    private SparseArray<String>titleArry=new SparseArray<>();
+    private SparseArray<String>titleArray=new SparseArray<>();
     private SparseArray<Fragment>fragmentArray=new SparseArray<>();
-    public static final String EXTRA_CINEMA_ID="cinema";
 
 
     @Override
@@ -67,10 +64,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     /** 自定义标题栏 **/
     private void setTitleMenu() {
-        titleArry.put(R.id.bar_title_tv_add_cinema,"添加影院");
-        titleArry.put(R.id.bar_title_tv_view_cinema,"影院列表");
-        titleArry.put(R.id.bar_title_tv_add_order,"添加订单");
-        titleArry.put(R.id.bar_title_tv_view_order,"订单列表");
+        titleArray.put(R.id.bar_title_tv_add_cinema,"添加影院");
+        titleArray.put(R.id.bar_title_tv_view_cinema,"影院列表");
+        titleArray.put(R.id.bar_title_tv_add_order,"添加订单");
+        titleArray.put(R.id.bar_title_tv_view_order,"订单列表");
         layoutMenu = findViewById(R.id.bar_title_layout_menu);
         layoutMenu.setVisibility(View.GONE);
         findViewById(R.id.bar_title_img_menu).setOnClickListener(v -> {
@@ -95,7 +92,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         search.setVisibility(View.VISIBLE);
         layoutMenu.setVisibility(View.GONE);
-        tvTitle.setText(titleArry.get(v.getId()));
+        tvTitle.setText(titleArray.get(v.getId()));
         FragmentTransaction transaction = manager.beginTransaction();
         Fragment fragment = fragmentArray.get(v.getId());
         if (fragment == null) {
@@ -133,21 +130,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         search.setVisibility(View.GONE);
     }
 
-    @Override
-    public void cancelAddCinema() {
-        Fragment addCinemaFragment=fragmentArray.get(R.id.bar_title_tv_add_cinema);
-        if (addCinemaFragment==null){
+    private void hideAndShow(int hideId,int showId){
+        Fragment hideFragment=fragmentArray.get(hideId);
+        if (hideFragment==null){
             return;
         }
-        Fragment cinemasFragment=fragmentArray.get(R.id.bar_title_tv_view_cinema);
+        Fragment showFragment=fragmentArray.get(showId);
         FragmentTransaction transaction=manager.beginTransaction();
-        if (cinemasFragment==null){
-            cinemasFragment=new CinemasFragment();
-            fragmentArray.put(R.id.bar_title_tv_view_cinema,cinemasFragment);
-            transaction.add(R.id.fragment_container,cinemasFragment);
+        if (showFragment==null){
+            showFragment = new CinemasFragment();
+            fragmentArray.put(hideId,showFragment);
+            transaction.add(R.id.fragment_container,showFragment);
         }
-        transaction.hide(addCinemaFragment).show(cinemasFragment ).commit();
-        tvTitle.setText(titleArry.get(R.id.bar_title_tv_add_cinema));
+        transaction.hide(hideFragment).show(showFragment).commit();
+        tvTitle.setText(titleArray.get(showId));
+
+    }
+
+    @Override
+    public void cancelAddCinema() {
+        hideAndShow(R.id.bar_title_tv_add_cinema,R.id.bar_title_tv_view_cinema);
+        search.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -166,7 +169,34 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             ((CinemasFragment)cinemasFragment).save(cinema);
         }
         transaction.hide(addCinemaFragment).show(cinemasFragment ).commit();
-        tvTitle.setText(titleArry.get(R.id.bar_title_tv_add_cinema));
+        tvTitle.setText(titleArray.get(R.id.bar_title_tv_add_cinema));
         }
+
+    @Override
+    public void cancelAddOrder() {
+        hideAndShow(R.id.bar_title_tv_add_order,R.id.bar_title_tv_view_order);
+        search.setVisibility(View.VISIBLE);
     }
+
+    @Override
+    public void saveOrder(Order order) {
+        Fragment addOrderFragment=fragmentArray.get(R.id.bar_title_tv_add_order);
+        if (addOrderFragment==null){
+            return;
+        }
+        Fragment ordersFragment=fragmentArray.get(R.id.bar_title_tv_view_order);
+        FragmentTransaction transaction=manager.beginTransaction();
+        if (ordersFragment==null){
+            //创建CinemasFragment同时要传Order对象进来
+            ordersFragment=new OrdersFragment(order);
+            fragmentArray.put(R.id.bar_title_tv_view_order,ordersFragment);
+            transaction.add(R.id.fragment_container,ordersFragment);
+        }else {
+            ((OrdersFragment)ordersFragment).save(order);
+        }
+        transaction.hide(addOrderFragment).show(ordersFragment).commit();
+        tvTitle.setText(titleArray.get(R.id.bar_title_tv_view_order));
+        search.setVisibility(View.VISIBLE);
+    }
+}
 
