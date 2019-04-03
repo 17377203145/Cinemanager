@@ -30,13 +30,17 @@ import net.lzzy.cinemanager.utils.ViewUtils;
  * @author Administrator
  */ //2.实现接口
 public class MainActivity extends AppCompatActivity implements View.OnClickListener,
-        OnFragmentInterctionListener, AddCinemasFragment.OnCinemasCreatedListener,AddOrdersFragment.OnOrderCreatedListener {
+        OnFragmentInterctionListener, AddCinemasFragment.OnCinemasCreatedListener,AddOrdersFragment.OnOrderCreatedListener
+ ,CinemasFragment.OnCinemaSelectedListenrt{
+    public static final String EXTRA_CINEMA_ID = "cinemaId";
+
     private FragmentManager manager=getSupportFragmentManager();
     private LinearLayout layoutMenu;
     private TextView tvTitle;
     private SearchView search;
     private SparseArray<String>titleArray=new SparseArray<>();
     private SparseArray<Fragment>fragmentArray=new SparseArray<>();
+
 
 
     @Override
@@ -162,7 +166,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Fragment cinemasFragment=fragmentArray.get(R.id.bar_title_tv_view_cinema);
         FragmentTransaction transaction=manager.beginTransaction();
         if (cinemasFragment==null){
-            cinemasFragment=new CinemasFragment(cinema);
+            cinemasFragment=CinemasFragment.newInstance(cinema);
             fragmentArray.put(R.id.bar_title_tv_view_cinema,cinemasFragment);
             transaction.add(R.id.fragment_container,cinemasFragment);
         }else {
@@ -188,7 +192,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         FragmentTransaction transaction=manager.beginTransaction();
         if (ordersFragment==null){
             //创建CinemasFragment同时要传Order对象进来
-            ordersFragment=new OrdersFragment(order);
+            ordersFragment=OrdersFragment.newInstance(order);
             fragmentArray.put(R.id.bar_title_tv_view_order,ordersFragment);
             transaction.add(R.id.fragment_container,ordersFragment);
         }else {
@@ -198,5 +202,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         tvTitle.setText(titleArray.get(R.id.bar_title_tv_view_order));
         search.setVisibility(View.VISIBLE);
     }
+    @Override
+    public void onCinemaSelected(String cinemaId) {
+        Intent intent=new Intent(this,CinemaOrdersActivity.class);
+        intent.putExtra(EXTRA_CINEMA_ID,cinemaId);
+        startActivity(intent);
+    }
+
+
+
 }
 
